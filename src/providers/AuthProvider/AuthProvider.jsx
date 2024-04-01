@@ -8,13 +8,16 @@ export const AuthContext = createContext(null)
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
+    const [loding,setLoding] = useState(true)
 
 
     const createUser = (email, password) => {
+        setLoding(true)
         return createUserWithEmailAndPassword(auth, email, password)
     }
 
     const singInUser = (email, password) => {
+        setLoding(true)
         return signInWithEmailAndPassword(auth, email, password)
     }
 
@@ -30,6 +33,7 @@ const AuthProvider = ({ children }) => {
     // },[])
 
     const logOut = () => {
+        setLoding(true)
         return signOut(auth)
     }
 
@@ -39,6 +43,7 @@ const AuthProvider = ({ children }) => {
         const unSubscribe = onAuthStateChanged(auth, currentUser => {
             console.log('currnet value of the current user', currentUser)
             setUser(currentUser)
+            setLoding(false)
         })
         return () => {
             unSubscribe
@@ -47,6 +52,7 @@ const AuthProvider = ({ children }) => {
 
     const authInfo = { 
         user,
+        loding,
          createUser,
           singInUser,
           logOut
