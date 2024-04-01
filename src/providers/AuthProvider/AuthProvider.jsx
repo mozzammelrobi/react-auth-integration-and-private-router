@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import PropTypes from 'prop-types';
 import { createContext, useEffect, useState } from 'react';
 import auth from "../../firebase/firebase.config";
@@ -6,11 +6,11 @@ import auth from "../../firebase/firebase.config";
 export const AuthContext = createContext(null)
 
 
-const AuthProvider = ({children}) => {
+const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
 
 
- const createUser = (email, password) =>  {
+    const createUser = (email, password) => {
         return createUserWithEmailAndPassword(auth, email, password)
     }
 
@@ -18,18 +18,39 @@ const AuthProvider = ({children}) => {
         return signInWithEmailAndPassword(auth, email, password)
     }
 
-    useEffect(() => {
-        const unSubscribe =  onAuthStateChanged(auth, (currentUser) => {
-         setUser(currentUser)
-         console.log('observing currnt user inside useeffect auth provider', currentUser)
-        })
+    // useEffect(() => {
+    //     const unSubscribe =  onAuthStateChanged(auth, (currentUser) => {
+    //      setUser(currentUser)
+    //      console.log('observing currnt user inside useeffect auth provider', currentUser)
+    //     })
 
+    //     return () => {
+    //         unSubscribe
+    //     }
+    // },[])
+
+    const logOut = () => {
+        return signOut(auth)
+    }
+
+
+    // obserbe auth state change
+    useEffect(() => {
+        const unSubscribe = onAuthStateChanged(auth, currentUser => {
+            console.log('currnet value of the current user', currentUser)
+            setUser(currentUser)
+        })
         return () => {
             unSubscribe
         }
-    },[])
+    }, [])
 
-    const authInfo = { user, createUser, singInUser }
+    const authInfo = { 
+        user,
+         createUser,
+          singInUser,
+          logOut
+         }
 
     return (
         <AuthContext.Provider value={authInfo}>
